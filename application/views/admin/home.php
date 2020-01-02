@@ -26,8 +26,8 @@
                     <div class="row">
                         <div class="col-md-6 col-lg-4">
                             <div class="statistic__item statistic__item--green">
-                                <h2 class="number"><?= $jml_penduduk;?></h2>
-                                <span class="desc">Penduduk Terdaftar</span>
+                                <h2 class="number"><?= $jml_dosen;?></h2>
+                                <span class="desc">Dosen Terdaftar</span>
                                 <div class="icon">
                                     <i class="zmdi zmdi-account-o"></i>
                                 </div>
@@ -44,7 +44,7 @@
                         </div>
                         <div class="col-md-6 col-lg-4">
                             <div class="statistic__item statistic__item--blue">
-                                <h2 class="number"><?= $penduduk_dinilai;?></h2>
+                                <h2 class="number"><?= $dosen_dinilai;?></h2>
                                 <span class="desc">Sudah dinilai</span>
                                 <div class="icon">
                                     <i class="zmdi zmdi-calendar-note"></i>

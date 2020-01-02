@@ -12,7 +12,7 @@
                                 <img src="<?= base_url(); ?>assets/img/icon/avatar-01.jpg" alt="John Doe" />
                             </div> -->
                             <div class="content">
-                                <a class="js-acc-btn" href="#"><?= $this->session->userdata('nama');?></a>
+                                <a class="js-acc-btn" ><?= $this->session->userdata('nama');?></a>
                             </div>
                             <div class="account-dropdown js-dropdown">
                                 <div class="account-dropdown__footer">

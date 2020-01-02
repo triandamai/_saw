@@ -13,7 +13,7 @@ class Admin extends MY_Controller
 
     public function checkSession()
     {
-        $cek = $this->session->userdata("nip");
+        $cek = $this->session->userdata("nidn");
         if (empty($cek)) {
             return false;
         } else {
@@ -29,11 +29,11 @@ class Admin extends MY_Controller
         } else {
             $data['page'] = 'admin/home';
             $data['ap'] = 'admin';
-            $data['profile'] = $this->DataModel->getWhere('nip', $this->session->userdata('nip'));
+            $data['profile'] = $this->DataModel->getWhere('nidn', $this->session->userdata('nidn'));
             $data['profile'] = $this->DataModel->getData('admin')->row();
-            $data['jml_penduduk'] = $this->DataModel->count_all('data_penduduk');
+            $data['jml_dosen'] = $this->DataModel->count_all('data_dosen');
             $data['jml_pegawai'] = $this->DataModel->count_all('data_pegawai');
-            $data['penduduk_dinilai'] = $this->DataModel->count_where('data_penduduk','sudah_dinilai',1);
+            $data['dosen_dinilai'] = $this->DataModel->count_where('data_dosen','sudah_dinilai',1);
             $this->load->view('master/dashboard', $data);
         }
     }
@@ -50,22 +50,24 @@ class Admin extends MY_Controller
             $this->load->view('master/login', $data); 
         } else {
             $data = array(
-                "nip" => $uname,
+                "nidn" => $uname,
                 "password" => $pass,
             );
             $result = $this->DataModel->Login("admin", $data)->row();
-            $pegawai = $this->DataModel->getWheretbl('data_pegawai','nip',$result->nip)->row();
+            $pegawai = $this->DataModel->getWheretbl('data_pegawai','nip',$result->nidn)->row();
             if ($result != null) {
                 $id = $result->id;
-                $username = $result->nip;
+                $username = $result->nidn;
                 $level = "admin";
                 $data_session = array(
                     'id' => $id,
-                    'nip' => $username,
+                    'nidn' => $username,
                     'level' => $level,
                     'status' => "login",
-                    'nama' => $pegawai->nama
+                    //'nama' => $pegawai->nama
                 );
+                // var_dump($result);
+                // die();
                 $this->session->set_userdata($data_session);
                 redirect(base_url('index.php/admin/index'));
             } else {
@@ -91,7 +93,7 @@ class Admin extends MY_Controller
          } else {
              $data['ap'] = 'pegawai';
              $data['page'] = 'admin/data_pegawai';
-             $data['profile'] = $this->DataModel->getWhere('nip', $this->session->userdata('nip'));
+             $data['profile'] = $this->DataModel->getWhere('nidn', $this->session->userdata('nidn'));
              $data['profile'] = $this->DataModel->getData('admin')->row();
              $data['pegawai'] = $this->DataModel->getData('data_pegawai')->result();
              $this->load->view('master/dashboard', $data);
@@ -124,21 +126,21 @@ class Admin extends MY_Controller
              }
 
              // DATA NILAI PENDUDUK
-            $nilai_nikPenduduk = $this->DataModel->select(array("nikPenduduk"));
-            $nilai_nikPenduduk = $this->DataModel->distinct();
-            $nilai_nikPenduduk = $this->DataModel->getData("nilai")->result();
+            $nilai_nidnDosen = $this->DataModel->select(array("nidnDosen"));
+            $nilai_nidnDosen = $this->DataModel->distinct();
+            $nilai_nidnDosen = $this->DataModel->getData("nilai")->result();
             $dataNilaiPendudukXXX = array();
-            foreach($nilai_nikPenduduk as $np){
-                $pendudukPerNik = $this->DataModel->getWhere("nikPenduduk", $np->nikPenduduk);
-                $pendudukPerNik = $this->DataModel->getData("nilai")->result();
+            foreach($nilai_nidnDosen as $np){
+                $dosenperNIDN = $this->DataModel->getWhere("nidnDosen", $np->nidnDosen);
+                $dosenperNIDN = $this->DataModel->getData("nilai")->result();
                 $index = 0;
                 $terpilih = array();
                 foreach($kriteria as $k){
-                    for($i = 0 ; $i < sizeof($pendudukPerNik) ; $i++){
-                        if($k->id == $pendudukPerNik[$i]->idKriteria){
-                            $namaValue = $this->DataModel->getWhere("id", (int) $pendudukPerNik[$i]->id_subKriteria);
+                    for($i = 0 ; $i < sizeof($dosenperNIDN) ; $i++){
+                        if($k->id == $dosenperNIDN[$i]->idKriteria){
+                            $namaValue = $this->DataModel->getWhere("id", (int) $dosenperNIDN[$i]->id_subKriteria);
                             $namaValue = $this->DataModel->getData("subkriteria")->result();
-                            $dataNilaiPendudukXXX["nik-".$np->nikPenduduk][$index] = array(
+                            $dataNilaiPendudukXXX["nik-".$np->nidnDosen][$index] = array(
                                 "id" => $namaValue[0]->id,
                                 "namaSubkategori" => $namaValue[0]->nama,
                                 "value" => $namaValue[0]->value
@@ -150,7 +152,7 @@ class Admin extends MY_Controller
                 }
                 for($i = 0 ; $i < sizeof($kriteria) ; $i++){
                     if(!in_array($i, $terpilih)){
-                        $dataNilaiPendudukXXX["nik-".$np->nikPenduduk][$i] = array(
+                        $dataNilaiPendudukXXX["nik-".$np->nidnDosen][$i] = array(
                             "namaSubkategori" => "",
                             "value" => ""
                         );
@@ -161,10 +163,10 @@ class Admin extends MY_Controller
             //  die(json_encode($dataNilaiPendudukXXX));
 
              $data['ap'] = 'penduduk';
-             $data['page'] = 'admin/data_penduduk';
-             $data['profile'] = $this->DataModel->getWhere('nip', $this->session->userdata('nip'));
+             $data['page'] = 'admin/data_dosen';
+             $data['profile'] = $this->DataModel->getWhere('nidn', $this->session->userdata('nip'));
              $data['profile'] = $this->DataModel->getData('admin')->row();
-             $data['penduduk'] = $this->DataModel->getData('data_penduduk')->result();
+             $data['dosen'] = $this->DataModel->getData('data_dosen')->result();
              $data['subKriteria'] = $subKriteria;
              $data['dataNilaiPendudukXXX'] = $dataNilaiPendudukXXX;
              $this->load->view('master/dashboard', $data);
@@ -197,7 +199,7 @@ class Admin extends MY_Controller
                     'jabatan' => $jabatan
                 );
                 $dataa = array(
-                    'nip' => $nip,
+                    'nidn' => $nip,
                     'password' => 'admin'
                 );
                 $simpan = $this->DataModel->insert('data_pegawai',$data);
@@ -235,7 +237,7 @@ class Admin extends MY_Controller
         }
     }
 
-    public function tambah_penduduk()
+    public function tambah_dosen()
     {
         $this->form_validation->set_rules('nik', 'NIK', 'required');
         $this->form_validation->set_rules('nama', 'Nama', 'required');
@@ -254,11 +256,11 @@ class Admin extends MY_Controller
                                                     <span aria-hidden="true">&times;</span>
                                                     </button></div>');
 
-            redirect(base_url('index.php/admin/data_penduduk'));
+            redirect(base_url('index.php/admin/data_dosen'));
         } else {
             if(is_numeric($nik)){
                 $data = array(
-                    'nik' => $nik,
+                    'nidn' => $nik,
                     'nama' => $nama,
                     'alamat' => $alamat,
                     'tanggungan' => $tanggungan,
@@ -268,8 +270,8 @@ class Admin extends MY_Controller
                     'nik' => $nik,
                     'password' => 'user'
                 );
-                 $this->DataModel->getWhere('nik',$nik);
-                 $cek_nik = $this->DataModel->getData('data_penduduk')->row();
+                 $this->DataModel->getWhere('nidn',$nik);
+                 $cek_nik = $this->DataModel->getData('data_dosen')->row();
                 if($cek_nik > 0){
                     $this->session->set_flashdata('pesan', '<div class="sufee-alert alert with-close alert-danger alert-dismissible fade show">
                                                         <span class="badge badge-pill badge-danger">Peringatan</span>
@@ -278,9 +280,9 @@ class Admin extends MY_Controller
                                                         <span aria-hidden="true">&times;</span>
                                                         </button></div>');
     
-                redirect(base_url('index.php/admin/data_penduduk'));
+                redirect(base_url('index.php/admin/data_dosen'));
                 }else{
-                    $simpan = $this->DataModel->insert('data_penduduk',$data);
+                    $simpan = $this->DataModel->insert('data_dosen',$data);
                     $simpan = $this->DataModel->insert('user',$dataa);
                 if($simpan){
                      //nilai
@@ -293,7 +295,7 @@ class Admin extends MY_Controller
                         foreach($idKriteria as $datanik){
                             array_push(
                                 $data, array(
-                                    'nikPenduduk' => $nik,
+                                    'nidnDosen' => $nik,
                                     'idKriteria' => $idKriteria[$index],
                                     'id_subKriteria' => $idSubkriteria[$index]
                                 
@@ -309,7 +311,7 @@ class Admin extends MY_Controller
                             <span aria-hidden="true">&times;</span>
                             </button></div>');
     
-                            redirect(base_url('index.php/admin/data_penduduk'));
+                            redirect(base_url('index.php/admin/data_dosen'));
                         }else{
     
                             $this->session->set_flashdata('pesan', '<div class="sufee-alert alert with-close alert-danger alert-dismissible fade show">
@@ -319,7 +321,7 @@ class Admin extends MY_Controller
                                                             <span aria-hidden="true">&times;</span>
                                                             </button></div>');
     
-                            redirect(base_url('index.php/admin/data_penduduk'));
+                            redirect(base_url('index.php/admin/data_dosen'));
                         }
                         
                 }else{
@@ -330,7 +332,7 @@ class Admin extends MY_Controller
                                                             <span aria-hidden="true">&times;</span>
                                                             </button></div>');
     
-                    redirect(base_url('index.php/admin/data_penduduk'));
+                    redirect(base_url('index.php/admin/data_dosen'));
                 }
                 }
             }else{
@@ -341,7 +343,7 @@ class Admin extends MY_Controller
                 <span aria-hidden="true">&times;</span>
                 </button></div>');
 
-                redirect(base_url('index.php/admin/data_penduduk'));
+                redirect(base_url('index.php/admin/data_dosen'));
             }
 
             
@@ -395,7 +397,7 @@ class Admin extends MY_Controller
         }
     }
 
-    public function ubah_penduduk()
+    public function ubah_dosen()
     {
         $this->form_validation->set_rules('nik', 'NIK', 'required');
         $this->form_validation->set_rules('nama', 'Nama', 'required');
@@ -407,13 +409,13 @@ class Admin extends MY_Controller
         $alamat = $this->input->post('alamat');
         if($this->form_validation->run() == false) {
             $this->session->set_flashdata('pesan', '<div class="sufee-alert alert with-close alert-danger alert-dismissible fade show">
-                                                    <span class="badge badge-pill badge-danger">Success</span>
-                                                    Gagal Menyimpan Perubahan Pastikan Semua Terisi dengan benar !
+                                                    <span class="badge badge-pill badge-danger">Error</span>
+                                                    Gagal Tervalidasi
                                                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
                                                     </button></div>');
 
-            redirect(base_url('index.php/admin/data_penduduk'));
+            redirect(base_url('index.php/admin/data_dosen'));
         } else {
             $data = array(
                 'nama' => $nama,
@@ -421,7 +423,7 @@ class Admin extends MY_Controller
                 'alamat' => $alamat,
                 'sudah_dinilai' => 0
             );
-            $simpan = $this->DataModel->update('nik',$nik,'data_penduduk',$data);
+            $simpan = $this->DataModel->update('nidn',$nik,'data_dosen',$data);
             
             if($simpan){
                 // $dataIDNilai = $this->DataModel->select('id');
@@ -436,7 +438,7 @@ class Admin extends MY_Controller
                 foreach($idKriteria as $datanik){
                         array_push(
                             $data, array(
-                                'nikPenduduk' => $nik,
+                                'nidnDosen' => $nik,
                                 'idKriteria' => $idKriteria[$index],
                                 'id_subKriteria' => $idSubkriteria[$index]
                             ));
@@ -444,7 +446,7 @@ class Admin extends MY_Controller
                     // $ubah = $this->DataModel->update('nikPenduduk',$nik,'nilai',$data);
                 }
                 // die(json_encode($data));
-                $ubah = $this->DataModel->getWhere('nikPenduduk',$nik);
+                $ubah = $this->DataModel->getWhere('nidnDosen',$nik);
                 $ubah = $this->DataModel->update_batch('nilai',$data,'idKriteria');    
                 
                 // die(json_encode($ubah));
@@ -456,27 +458,27 @@ class Admin extends MY_Controller
                                                         <span aria-hidden="true">&times;</span>
                                                         </button></div>');
 
-                redirect(base_url('index.php/admin/data_penduduk'));
+                redirect(base_url('index.php/admin/data_dosen'));
                 }else{
 
                     $this->session->set_flashdata('pesan', '<div class="sufee-alert alert with-close alert-danger alert-dismissible fade show">
                                                         <span class="badge badge-pill badge-danger">Gagal</span>
-                                                        Gagal Menyimpan Perubahan Pastikan Semua Terisi dengan benar !
+                                                        Gagal Menyimpan Perubahan Failed
                                                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                                         <span aria-hidden="true">&times;</span>
                                                         </button></div>');
 
-                redirect(base_url('index.php/admin/data_penduduk'));
+                redirect(base_url('index.php/admin/data_dosen'));
                 }          
             }else{
                 $this->session->set_flashdata('pesan', '<div class="sufee-alert alert with-close alert-danger alert-dismissible fade show">
                                                         <span class="badge badge-pill badge-danger">Success</span>
-                                                        Gagal Menyimpan Perubahan Pastikan Semua Terisi dengan benar !
+                                                        Gagal Menyimpan Perubahan Step 1
                                                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                                         <span aria-hidden="true">&times;</span>
                                                         </button></div>');
 
-                redirect(base_url('index.php/admin/data_penduduk'));
+                redirect(base_url('index.php/admin/data_dosen'));
             }
         }
     }
@@ -514,7 +516,7 @@ class Admin extends MY_Controller
         $nik = $this->input->post('nik');
         
         $delete = $this->DataModel->delete('nik',$nik,'user');
-        $delete = $this->DataModel->delete('nik',$nik,'data_penduduk');
+        $delete = $this->DataModel->delete('nidn',$nik,'data_dosen');
 
         if($delete){
             $this->session->set_flashdata('pesan', '<div class="sufee-alert alert with-close alert-primary alert-dismissible fade show">
@@ -524,7 +526,7 @@ class Admin extends MY_Controller
                                                     <span aria-hidden="true">&times;</span>
                                                     </button></div>');
 
-            redirect(base_url('index.php/admin/data_penduduk'));
+            redirect(base_url('index.php/admin/data_dosen'));
         }else{
             $this->session->set_flashdata('pesan', '<div class="sufee-alert alert with-close alert-danger alert-dismissible fade show">
                                                     <span class="badge badge-pill badge-danger">Success</span>
@@ -534,7 +536,7 @@ class Admin extends MY_Controller
                                                     </button></div>');
 
 
-            redirect(base_url('index.php/admin/data_penduduk'));
+            redirect(base_url('index.php/admin/data_dosen'));
         }
     }
     public function data_kriteria()
@@ -565,7 +567,7 @@ class Admin extends MY_Controller
              }
             //  die(json_encode($subKriteria[0][1][0]["id_kriteria"]));
             $data['page'] = 'admin/kriteria';
-            $data['profile'] = $this->DataModel->getWhere('nip', $this->session->userdata('nip'));
+            $data['profile'] = $this->DataModel->getWhere('nidn', $this->session->userdata('nidn'));
             $data['profile'] = $this->DataModel->getData('admin')->row();
             $data['kriteria'] = $this->DataModel->getData('kriteria')->result();
             $data['subkriteria'] = $this->DataModel->getData('subkriteria')->result();
@@ -749,9 +751,9 @@ class Admin extends MY_Controller
          } else {
             $data['ap'] = 'notnilai';
             $data['page'] = 'admin/penilaian';
-            $data['profile'] = $this->DataModel->getWhere('nip', $this->session->userdata('nip'));
+            $data['profile'] = $this->DataModel->getWhere('nidn', $this->session->userdata('nidn'));
             $data['profile'] = $this->DataModel->getData('admin')->row();
-            $data['penduduk'] = $this->DataModel->getWheretbl('data_penduduk','sudah_dinilai',0)->result();
+            $data['penduduk'] = $this->DataModel->getWheretbl('data_dosen','sudah_dinilai',0)->result();
 
            
             $this->load->view('master/dashboard', $data);
@@ -794,7 +796,7 @@ class Admin extends MY_Controller
             $data['page'] = 'admin/form_penilaian';
             $data['profile'] = $this->DataModel->getWhere('nip', $this->session->userdata('nip'));
             $data['profile'] = $this->DataModel->getData('admin')->row();
-            $data['penduduk'] = $this->DataModel->getWheretbl('data_penduduk','nik',$nik)->result();
+            $data['penduduk'] = $this->DataModel->getWheretbl('data_dosen','nik',$nik)->result();
             $data['subKriteria'] = $subKriteria;
             $this->load->view('master/dashboard', $data);
         }
@@ -891,12 +893,12 @@ class Admin extends MY_Controller
             }
 
             // DATA NILAI PENDUDUK
-            $nilai_nikPenduduk = $this->DataModel->select(array("nikPenduduk"));
-            $nilai_nikPenduduk = $this->DataModel->distinct();
-            $nilai_nikPenduduk = $this->DataModel->getData("nilai")->result();
+            $nilai_nidndosen = $this->DataModel->select(array("nidnDosen"));
+            $nilai_nidndosen = $this->DataModel->distinct();
+            $nilai_nidndosen = $this->DataModel->getData("nilai")->result();
             $dataNilaiPendudukXXX = array();
-            foreach($nilai_nikPenduduk as $np){
-                $pendudukPerNik = $this->DataModel->getWhere("nikPenduduk", $np->nikPenduduk);
+            foreach($nilai_nidndosen as $nidn){
+                $pendudukPerNik = $this->DataModel->getWhere("nidnDosen", $nidn->nidnDosen);
                 $pendudukPerNik = $this->DataModel->getData("nilai")->result();
                 $index = 0;
                 $terpilih = array();
@@ -905,7 +907,7 @@ class Admin extends MY_Controller
                         if($k->id == $pendudukPerNik[$i]->idKriteria){
                             $namaValue = $this->DataModel->getWhere("id", (int) $pendudukPerNik[$i]->id_subKriteria);
                             $namaValue = $this->DataModel->getData("subkriteria")->result();
-                            $dataNilaiPendudukXXX["nik-".$np->nikPenduduk][$index] = array(
+                            $dataNilaiPendudukXXX["nik-".$nidn->nidnDosen][$index] = array(
                                 "namaSubkategori" => $namaValue[0]->nama,
                                 "value" => $namaValue[0]->value
                             );
@@ -916,7 +918,7 @@ class Admin extends MY_Controller
                 }
                 for($i = 0 ; $i < sizeof($kriteria) ; $i++){
                     if(!in_array($i, $terpilih)){
-                        $dataNilaiPendudukXXX["nik-".$np->nikPenduduk][$i] = array(
+                        $dataNilaiPendudukXXX["nik-".$nidn->nikPenduduk][$i] = array(
                             "namaSubkategori" => "",
                             "value" => ""
                         );
@@ -926,20 +928,20 @@ class Admin extends MY_Controller
 
             // die(json_encode($dataNilaiPendudukXXX));
             $dataNilaiPenduduk = $this->DataModel->select(array(
-                "data_penduduk.nik as nik", 
-                "data_penduduk.nama as nama_orang", 
+                "data_dosen.nidn as nik", 
+                "data_dosen.nama as nama_orang", 
                 "kriteria.nama as nama_kriteria",
                 "subkriteria.nama as nama_sub_kriteria",
                 "subkriteria.value as value"));
 
-            $dataNilaiPenduduk = $this->DataModel->getJoin("data_penduduk","nilai.nikPenduduk = data_penduduk.nik","INNER");
+            $dataNilaiPenduduk = $this->DataModel->getJoin("data_dosen","nilai.nidnDosen = data_dosen.nidn","INNER");
             $dataNilaiPenduduk = $this->DataModel->getJoin("kriteria","nilai.idKriteria = kriteria.id","INNER");
             $dataNilaiPenduduk = $this->DataModel->getJoin("subkriteria","nilai.id_subKriteria = subkriteria.id","INNER");
             $dataNilaiPenduduk = $this->DataModel->getData("nilai")->result();
 
-            $dataNamaPenduduk = $this->DataModel->select(array("data_penduduk.nama", "data_penduduk.nik"));
+            $dataNamaPenduduk = $this->DataModel->select(array("data_dosen.nama", "data_dosen.nidn"));
             $dataNamaPenduduk = $this->DataModel->distinct();
-            $dataNamaPenduduk = $this->DataModel->getJoin("data_penduduk","nilai.nikPenduduk = data_penduduk.nik","INNER");
+            $dataNamaPenduduk = $this->DataModel->getJoin("data_dosen","nilai.nidnDosen = data_dosen.nidn","INNER");
             $dataNamaPenduduk = $this->DataModel->getData("nilai")->result();
 
             //NORMALISASI DATA
@@ -956,14 +958,16 @@ class Admin extends MY_Controller
                 $getMinMax  = $this->DataModel->limit(1);
                 $getMinMax  = $this->DataModel->getData("nilai")->result()[0]->value;
 
+                //var_dump($getMinMax);
+              //  die();
                 $nilaiMinMax = floatval($getMinMax);
                 // $nilaiMinMax = 0;
 
                 $ambilData = $this->DataModel->select(array(
-                    "data_penduduk.nik as nik",
-                    "data_penduduk.nama as nama",
+                    "data_dosen.nidn as nidn",
+                    "data_dosen.nama as nama",
                     "subKriteria.value as value"));
-                $ambilData = $this->DataModel->getJoin("data_penduduk","nilai.nikPenduduk = data_penduduk.nik","INNER");
+                $ambilData = $this->DataModel->getJoin("data_dosen","nilai.nidnDosen = data_dosen.nidn","INNER");
                 $ambilData = $this->DataModel->getJoin("kriteria","nilai.idKriteria = kriteria.id","INNER");
                 $ambilData = $this->DataModel->getJoin("subkriteria","nilai.id_subKriteria = subkriteria.id","INNER");
                 $ambilData = $this->DataModel->getWhere("nilai.idKriteria", (int) $k->id);
@@ -973,7 +977,7 @@ class Admin extends MY_Controller
                 // die(json_encode($kriteria));
                 
                 for($i = 0 ; $i < sizeof($ambilData) ; $i++){
-                   $normalisasiNilaiX["nik-".$ambilData[$i]->nik][$indexNormalisasi] = array(
+                   $normalisasiNilaiX["nik-".$ambilData[$i]->nidn][$indexNormalisasi] = array(
                        "sifat"              => $k->sifat,
                        "perhitungan"        => $k->sifat == "cost" ? "min X / X" : "X / Max X",
                        "value_asli"         => floatval($ambilData[$i]->value),
@@ -993,30 +997,30 @@ class Admin extends MY_Controller
             $hasilAkhir = array();
             for($i = 0 ; $i < sizeof($ambilData) ; $i++){
                 $nilaiHasilAkhir = 0;
-                foreach($normalisasiNilaiX["nik-".$ambilData[$i]->nik] as $apaya){
+                foreach($normalisasiNilaiX["nik-".$ambilData[$i]->nidn] as $apaya){
                     $nilaiHasilAkhir += $apaya["hasil"];
                     // die(json_encode($apaya["hasil"]));
                 }
-                $hasilAkhir[$ambilData[$i]->nik] = floatval(number_format(($nilaiHasilAkhir),2));
+                $hasilAkhir[$ambilData[$i]->nidn] = floatval(number_format(($nilaiHasilAkhir),2));
                 
             }
 
             $namaSamaNik = array();
             for($i = 0 ; $i < sizeof($dataNamaPenduduk) ; $i++){
-                $namaSamaNik[$dataNamaPenduduk[$i]->nik] = $dataNamaPenduduk[$i]->nama;
+                $namaSamaNik[$dataNamaPenduduk[$i]->nidn] = $dataNamaPenduduk[$i]->nama;
             }
 
             $datPen = array();
             for($i = 0 ; $i < sizeof($dataNamaPenduduk) ; $i++){
-                $datPen[$dataNamaPenduduk[$i]->nik] = array(
-                "nik" => $dataNamaPenduduk[$i]->nik,
+                $datPen[$dataNamaPenduduk[$i]->nidn] = array(
+                "nik" => $dataNamaPenduduk[$i]->nidn,
                 "nama" => $dataNamaPenduduk[$i]->nama,
                 );
             }
 
             $nik = array();
             for($i = 0 ; $i < sizeof($dataNamaPenduduk) ; $i++){
-                $nik[$dataNamaPenduduk[$i]->nik] = $dataNamaPenduduk[$i]->nik;
+                $nik[$dataNamaPenduduk[$i]->nidn] = $dataNamaPenduduk[$i]->nidn;
             }
 
             // die(json_encode($datPen));

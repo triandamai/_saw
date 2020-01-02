@@ -37,7 +37,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="<?= base_url()?>index.php/admin/data_penduduk">
+                    <a href="<?= base_url()?>index.php/admin/data_dosen">
                         <i class="fas fa-users"></i>Input Data Dosen</a>
                     </a>
                 </li>
@@ -91,7 +91,7 @@
                     </a>
                 </li>
                 <li class="<?php if($ap == "penduduk"){echo "active"; } ?>">
-                    <a href="<?= base_url()?>index.php/admin/data_penduduk">
+                    <a href="<?= base_url()?>index.php/admin/data_dosen">
                         <i class="fas fa-users"></i>Input Data Dosen</a>
                     </a>
                 </li>

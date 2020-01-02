@@ -190,7 +190,7 @@
 																			<td><?= $no ?></td>
 																			<td><?= $dnp->nama; ?></td>
 																			<?php $index = 0; foreach($kriteria as $k){ ?>
-																			<td><?= $dataNilaiPendudukXXX["nik-".$dnp->nik][$index]["namaSubkategori"]; ?>
+																			<td><?= $dataNilaiPendudukXXX["nik-".$dnp->nidn][$index]["namaSubkategori"]; ?>
 																			</td>
 																			<?php $index++; } ?>
 																		</tr>
@@ -223,7 +223,7 @@
 																			<td><?= $no ?></td>
 																			<td><?= $dnp->nama; ?></td>
 																			<?php $index = 0; foreach($kriteria as $k){ ?>
-																			<td><?= $dataNilaiPendudukXXX["nik-".$dnp->nik][$index]["value"]; ?>
+																			<td><?= $dataNilaiPendudukXXX["nik-".$dnp->nidn][$index]["value"]; ?>
 																			</td>
 																			<?php $index++; } ?>
 																		</tr>
@@ -256,7 +256,7 @@
 																			<td><?= $no ?></td>
 																			<td><?= $dnp->nama; ?></td>
 																			<?php $index = 0; foreach($kriteria as $k){ ?>
-																			<td><?= $normalisasiNilaiX["nik-".$dnp->nik][$index]["value_normalisasi"]; ?>
+																			<td><?= $normalisasiNilaiX["nik-".$dnp->nidn][$index]["value_normalisasi"]; ?>
 																			</td>
 																			<?php $index++; } ?>
 																		</tr>
